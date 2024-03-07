@@ -1,8 +1,14 @@
 import { Scene } from 'engine/Scene.js';
+import { HALF_TILE_SIZE, STAGE_OFFSET_Y } from 'game/constants/game.js';
+import { LevelMap } from 'game/entities/LevelMap.js';
 
 export class BattleScene extends Scene {
-  constructor() {
+  constructor(time, camera) {
     super();
+
+    this.stage = new LevelMap();
+
+    camera.position = { x: HALF_TILE_SIZE, y: -STAGE_OFFSET_Y };
   }
 
   update(time, context, camera) {
@@ -10,10 +16,6 @@ export class BattleScene extends Scene {
   }
 
   draw(context, camera) {
-    // Add your main draw calls here
-  }
-
-  cleanUp() {
-    // Can be used to clean
+    this.stage.draw(context, camera);
   }
 }
