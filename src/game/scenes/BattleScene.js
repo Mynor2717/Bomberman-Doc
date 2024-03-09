@@ -16,7 +16,7 @@ export class BattleScene extends Scene {
   }
 
   update(time) {
-    this.player.update(time);
+    // this.player.update(time);
   }
 
   draw(context, camera) {
