@@ -10,13 +10,13 @@ export class BattleScene extends Scene {
 
     this.stage = new LevelMap();
     this.hud = new BattleHud();
-    this.player = new Bomberman({ x: 2, y: 1 }, time);
+    this.player = new Bomberman({ x: 0.3, y: 1 }, time);
 
     camera.position = { x: HALF_TILE_SIZE, y: -STAGE_OFFSET_Y };
   }
 
   update(time) {
-    // this.player.update(time);
+    this.player.Update(time);
   }
 
   draw(context, camera) {
