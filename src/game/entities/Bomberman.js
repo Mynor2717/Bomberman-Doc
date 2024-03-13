@@ -16,10 +16,13 @@ export class Bomberman extends Entity {
   baseSpeedTime = WALK_SPEED;
   speedMultiplier = 1.2;
   animation = animations.moveAnimations[this.direction];
-  collisionMap = [...collisionMap];
+
+  //Numero de bombas que puede poner al mismo tiempo
+  bombAmount = 1;
+  availableBombs = this.bombAmount;
 
 
-  constructor(position, time) {
+  constructor(position, time, stageCollisionMap, onBombPlaced) {
     super({ x: (position.x * TILE_SIZE) * HALF_TILE_SIZE, y: (position.y * TILE_SIZE) + HALF_TILE_SIZE });
 
     this.states = {
@@ -34,6 +37,9 @@ export class Bomberman extends Entity {
         update: this.handleMovingState,
       },
     };
+
+    this.collisionMap = stageCollisionMap;
+    this.onBombPlaced = onBombPlaced;
 
     this.changeState(BombermanStateType.IDLE, time);
   }
@@ -124,8 +130,9 @@ export class Bomberman extends Entity {
     this.velocity = { x: 0, y: 0 };
   };
 
-  handleGeneralState = () => {
+  handleGeneralState = (time) => {
     const [direction, velocity] = this.getMovement();
+    if (control.isControlPressed(this.id, control.ACTION)) this.handleBombPlacement(time);
 
     this.animation = animations.moveAnimations[direction];
     this.direction = direction;
@@ -134,18 +141,32 @@ export class Bomberman extends Entity {
   };
 
   handleIdleState = (time) => {
-    const velocity = this.handleGeneralState();
+    const velocity = this.handleGeneralState(time);
     if (isZero(velocity)) return;
 
     this.changeState(BombermanStateType.MOVING, time);
   };
 
   handleMovingState = (time) => {
-    this.velocity = this.handleGeneralState();
+    this.velocity = this.handleGeneralState(time);
     if (!isZero(this.velocity)) return;
 
     this.changeState(BombermanStateType.IDLE, time);
   };
+
+  handleBombPlacement(time) {
+    if (this.availableBombs <= 0) return;
+
+    const playerCell = {
+      row: Math.floor(this.position.y / TILE_SIZE),
+      column: Math.floor(this.position.x / TILE_SIZE),
+    };
+    if (this.collisionMap[playerCell.row][playerCell.column] !== CollisionTile.EMPTY) return;
+
+    this.availableBombs -= 1;
+
+    this.onBombPlaced(playerCell, time);
+  }
 
   updatePosition(time) {
     this.position.x += (this.velocity.x * this.baseSpeedTime * this.speedMultiplier) * time.secondsPassed;
