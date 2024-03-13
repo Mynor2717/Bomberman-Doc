@@ -4,7 +4,8 @@ import * as control from 'engine/inputHandler.js';
 import { CollisionTile, collisionMap } from 'game/constants/LevelData.js';
 import { BombermanStateType, WALK_SPEED, animations, frames } from 'game/constants/bomberman.js';
 import { CounterDirectionsLookup, Direction, MovementLookup } from 'game/constants/entities.js';
-import { FRAME_TIME, HALF_TILE_SIZE, TILE_SIZE } from 'game/constants/game.js';
+import { DEBUG, FRAME_TIME, HALF_TILE_SIZE, TILE_SIZE } from 'game/constants/game.js';
+import { drawBox, drawCross } from 'game/utils/debug.js';
 import { isZero } from 'game/utils/utils.js';
 
 export class Bomberman extends Entity {
@@ -40,9 +41,9 @@ export class Bomberman extends Entity {
   changeState(newState, time) {
     this.currentState = this.states[newState];
     this.animationFrame = 0;
-    this.animationTimer = time.previous + this.animation[this.animationFrame] * FRAME_TIME;
 
     this.currentState.init(time);
+    this.animationTimer = time.previous + this.animation[this.animationFrame][1] * FRAME_TIME;
   }
 
   getCollisionTile(tile) {
@@ -152,7 +153,7 @@ export class Bomberman extends Entity {
   }
 
   updateAnimation(time) {
-    if (time.previous < this.animationTimer || isZero(this.velocity)) return;
+    if (time.previous < this.animationTimer || this.currentState.type === BombermanStateType.IDLE) return;
 
     this.animationFrame += 1;
     if (this.animationFrame >= this.animation.length) this.animationFrame = 0;
@@ -177,6 +178,13 @@ export class Bomberman extends Entity {
       Math.floor(this.position.y - camera.position.y),
       [this.direction === Direction.RIGHT ? -1 : 1, 1],
     );
+
+    if (!DEBUG) return;
+
+    drawBox(context, camera, [
+      this.position.x - HALF_TILE_SIZE, this.position.y - HALF_TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1,
+    ], '#FFFF00');
+    drawCross(context, camera, { x: this.position.x, y: this.position.y }, '#FFF');
   }
 
 }
