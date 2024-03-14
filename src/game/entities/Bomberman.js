@@ -56,10 +56,9 @@ export class Bomberman extends Entity {
 
   getCollisionTile(tile) {
     // al comentar
-    if (
-      this.lastBombCell && tile.row === this.lastBombCell.row
-      && tile.column === this.lastBombCell.column
-    ) return CollisionTile.EMPTY;
+
+    // if (this.lastBombCell && tile.row === this.lastBombCell.row && tile.column === this.lastBombCell.column
+    // ) return CollisionTile.EMPTY;
 
     //todo este codigo hay una diferencia de las colisones con respecto a las bombas
 
