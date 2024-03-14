@@ -1,17 +1,22 @@
+import { Bomb } from 'game/entities/Bomb.js';
+
 export class BombSystem {
 
-  bomb = [];
+  bombs = [];
 
   constructor(stageCollisionMap) {
     this.stageCollisionMap = stageCollisionMap;
   }
 
-  remove = () => {
+  remove = (bomb) => {
+    const index = this.bombs.indexOf(bomb);
+    if (index < 0) return;
 
+    this.bombs.splice(index, 1);
   };
 
   add = (cell, time) => {
-    this.bombs.push();
+    this.bombs.push(new Bomb(cell, time, this.remove));
   };
 
   update(time) {
