@@ -20,6 +20,7 @@ export class Bomberman extends Entity {
 
   //Numero de bombas que puede poner al mismo tiempo
   bombAmount = 1;
+  bombStrength = 2;
   availableBombs = this.bombAmount;
   lastBombCell = undefined;
 
@@ -180,7 +181,7 @@ export class Bomberman extends Entity {
     this.availableBombs -= 1;
     this.lastBombCell = playerCell;
 
-    this.onBombPlaced(playerCell, time, this.handleBombExploded);
+    this.onBombPlaced(playerCell, this.bombStrength, time, this.handleBombExploded);
   }
 
   updatePosition(time) {
