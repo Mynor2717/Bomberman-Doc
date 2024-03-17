@@ -1,6 +1,7 @@
 import { CollisionTile } from 'game/constants/LevelData.js';
 import { FlameDirectionLookup } from 'game/constants/bombs.js';
 import { Bomb } from 'game/entities/Bomb.js';
+import { BombExplosion } from 'game/entities/BombExplosion.js';
 
 export class BombSystem {
   bombs = [];
@@ -46,13 +47,22 @@ export class BombSystem {
     if (index < 0) return;
 
     const flameCells = this.getFlameCells(bomb.cell, strength, time);
+    this.bombs[index] = new BombExplosion(bomb.cell, flameCells, time, this.remove);
+
+    this.collisionMap[bomb.cell.row][bomb.cell.column] = CollisionTile.FLAME;
+    for (const flamecell of flameCells) {
+      this.collisionMap[flamecell.cell.row][flamecell.cell.column] = CollisionTile.FLAME;
+    }
   }
 
-  remove = (bomb) => {
-    const index = this.bombs.indexOf(bomb);
+  remove = (BombExplosion) => {
+    const index = this.bombs.indexOf(BombExplosion);
     if (index < 0) return;
 
-    this.collisionMap[bomb.cell.row][bomb.cell.column] = CollisionTile.EMPTY;
+    this.collisionMap[BombExplosion.cell.row][BombExplosion.cell.column] = CollisionTile.EMPTY;
+    for (const flamecell of BombExplosion.flameCells) {
+      this.collisionMap[flamecell.cell.row][flamecell.cell.column] = CollisionTile.EMPTY;
+    }
     this.bombs.splice(index, 1);
   };
 
