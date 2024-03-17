@@ -36,11 +36,6 @@ export class BombExplosion {
   updateAnimation(time) {
     if (time.previous < this.animationTimer) return;
 
-  }
-
-  update(time) {
-    this.updateAnimation(time);
-
     this.animationFrame += 1;
     this.animationTimer = time.previous + EXPLOSION_FRAME_DELAY;
 
@@ -48,6 +43,11 @@ export class BombExplosion {
 
     this.animationFrame = 0;
     this.onEnd(this);
+
+  }
+
+  update(time) {
+    this.updateAnimation(time);
   }
 
   draw(context, camera) {
