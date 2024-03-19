@@ -1,13 +1,14 @@
 import { CollisionTile } from 'game/constants/LevelData.js';
-import { FlameDirectionLookup } from 'game/constants/bombs.js';
+import { BOMB_EXPLODE_DELAY, FlameDirectionLookup } from 'game/constants/bombs.js';
 import { Bomb } from 'game/entities/Bomb.js';
 import { BombExplosion } from 'game/entities/BombExplosion.js';
 
 export class BombSystem {
   bombs = [];
 
-  constructor(stageCollisionMap) {
+  constructor(stageCollisionMap, onBlockDestroyed) {
     this.collisionMap = stageCollisionMap;
+    this.onBlockDestroyed = onBlockDestroyed;
   }
 
   getFlameCellsFor(rowOffset, columnOffset, startcell, length) {
@@ -27,14 +28,37 @@ export class BombSystem {
       });
     }
 
-    return flameCells;
+    return { cells: flameCells, endCell: cell };
+  }
+
+  handleEndResult(endCell, time) {
+    const endResult = this.collisionMap[endCell.row][endCell.column] ?? CollisionTile.EMPTY;
+
+    switch (endResult) {
+      case CollisionTile.BLOCK:
+        this.onBlockDestroyed(endCell, time);
+        break;
+
+
+      case CollisionTile.BOMB: {
+        const bombToExplode = this.bombs.find((bomb) =>
+          endCell.row === bomb.cell.row && endCell.column === bomb.cell.column,
+        );
+        if (!bombToExplode) return;
+
+
+        bombToExplode.fuseTimer = time.previous + BOMB_EXPLODE_DELAY;
+        break;
+      }
+    }
   }
 
   getFlameCells(startcell, length, time) {
     const flameCells = [];
 
     for (const [rowOffset, columnOffset] of FlameDirectionLookup) {
-      const cells = this.getFlameCellsFor(rowOffset, columnOffset, startcell, length);
+      const { cells, endCell } = this.getFlameCellsFor(rowOffset, columnOffset, startcell, length);
+      this.handleEndResult(endCell, time);
 
       if (cells.length > 0) flameCells.push(...cells);
     }
