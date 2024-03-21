@@ -12,7 +12,7 @@ export class BattleScene extends Scene {
 
     this.stage = new Stage();
     this.hud = new BattleHud();
-    this.blockSystem = new BlockSystem(this.stage.updateMapAt);
+    this.blockSystem = new BlockSystem(this.stage.updateMapAt, this.stage.getCollisionTileAt);
     this.bombSystem = new BombSystem(this.stage.collisionMap, this.blockSystem.add);
     this.player = new Bomberman(
       { x: 0.3, y: 1 },
