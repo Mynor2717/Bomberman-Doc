@@ -39,6 +39,11 @@ export const MapCollisionTileLookup = {
 
 export const stageData = {
   maxBloks: 50,
+  powerups: {
+    [CollisionTile.POWERUP_FLAME]: 8,
+    [CollisionTile.POWERUP_BOMB]: 8,
+    [CollisionTile.POWERUP_SPEED]: 4,
+  },
   tiles: [
     [29, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 29],
     [29, 30, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 59, 30, 29],

@@ -10,12 +10,16 @@ export class BlockSystem {
   blocks = [];
 
 
-  constructor(updateStageMapAt, getStageCollisionTileAt) {
+  constructor(updateStageMapAt, getStageCollisionTileAt, addPowerup) {
     this.updateStageMapAt = updateStageMapAt;
     this.getStageCollisionTileAt = getStageCollisionTileAt;
+    this.addPowerup = addPowerup;
 
     this.addBlocksToStage();
+    this.addRandomPowerupsToBlocks();
   }
+
+  getRandomBlockIndex = () => Math.floor(Math.random() * (this.blocks.length) - 1);
 
   isBlockAllowedAt(cell) {
     const isStartZone = playerStarCoords.some(([startRow, startColumn]) =>
@@ -40,8 +44,30 @@ export class BlockSystem {
       this.blocks.push({
         cell,
         entity: undefined,
+        powerup: undefined,
       });
     }
+  }
+
+  addRandomPowerupsToBlocks() {
+    for (const [type, amount] of Object.entries(stageData.powerups)) {
+      for (let index = 0; index < amount; index++) {
+        let blockIndex = this.getRandomBlockIndex();
+
+        while (this.blocks[blockIndex].powerup) {
+          blockIndex = (blockIndex + 1) % this.blocks.length;
+        }
+
+
+        this.blocks[blockIndex].powerup = Number(type);
+      }
+    }
+  }
+
+  handleSpawnPowerUp(index) {
+    if (!this.blocks[index].powerup) return;
+
+    this.addPowerup(this.blocks[index].cell, this.blocks[index].powerup);
   }
 
   remove = (destroyedBlock) => {
@@ -51,6 +77,7 @@ export class BlockSystem {
     if (index < 0) return;
 
     this.updateStageMapAt(destroyedBlock.cell, MapTile.FLOOR);
+    this.handleSpawnPowerUp(index);
     this.blocks.splice(index, 1);
   };
 
