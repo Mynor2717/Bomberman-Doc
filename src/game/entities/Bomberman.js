@@ -19,7 +19,7 @@ export class Bomberman extends Entity {
   animation = animations.moveAnimations[this.direction];
 
   //Numero de bombas que puede poner al mismo tiempo
-  bombAmount = 5;
+  bombAmount = 1;
   bombStrength = 2;
   availableBombs = this.bombAmount;
   lastBombCell = undefined;
@@ -67,6 +67,12 @@ export class Bomberman extends Entity {
     this.velocity.y = 0;
   };
 
+
+  getCollisionRect = () => ({
+    x: this.position.x - (HALF_TILE_SIZE / 2), y: this.position.y - (HALF_TILE_SIZE / 2),
+    width: HALF_TILE_SIZE, height: HALF_TILE_SIZE,
+  });
+
   reset(time) {
     this.animationFrame = 0;
     this.direction = Direction.DOWN;
@@ -109,6 +115,23 @@ export class Bomberman extends Entity {
           { row: Math.floor((this.position.y + 8) / TILE_SIZE), column: Math.floor((this.position.x - 8) / TILE_SIZE) },
           { row: Math.floor((this.position.y + 8) / TILE_SIZE), column: Math.floor((this.position.x + 7) / TILE_SIZE) },
         ];
+    }
+  }
+
+  applyPowerup(type) {
+    switch (type) {
+      case CollisionTile.POWERUP_FLAME:
+        this.bombStrength += 1;
+        break;
+
+      case CollisionTile.POWERUP_BOMB:
+        this.bombAmount += 1;
+        this.availableBombs += 1;
+        break;
+
+      case CollisionTile.POWERUP_SPEED:
+        this.speedMultiplier += 0.4;
+        break;
     }
   }
 

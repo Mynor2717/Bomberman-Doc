@@ -1,4 +1,5 @@
 import { drawFrame } from 'engine/context.js';
+import { rectanglesOverlap } from 'engine/utils/collisions.js';
 import { FRAME_TIME, TILE_SIZE } from 'game/constants/game.js';
 
 const FRAME_DELAY = 8 * FRAME_TIME;
@@ -8,9 +9,15 @@ export class PowerupSystem {
   animationFrame = 0;
   powerups = [];
 
-  constructor(time) {
+  constructor(time, players) {
+    this.players = players;
     this.animationTimer = time.previous + FRAME_DELAY;
   }
+
+  getCollisionRectFor = (powerup) => ({
+    x: powerup.cell.column * TILE_SIZE, y: powerup.cell.row * TILE_SIZE,
+    width: TILE_SIZE, height: TILE_SIZE,
+  });
 
   remove = (powerup) => {
     const index = this.powerups.indexOf(powerup);
@@ -33,8 +40,20 @@ export class PowerupSystem {
     this.animationTimer = time.previous + FRAME_DELAY;
   }
 
+  hasPlayerCollided() {
+    for (const player of this.players) {
+      for (const powerup of this.powerups) {
+        if (!rectanglesOverlap(player.getCollisionRect(), this.getCollisionRectFor(powerup))) continue;
+
+        player.applyPowerup(powerup.type);
+        this.remove(powerup);
+      }
+    }
+  }
+
   update(time) {
     this.updateAnimation(time);
+    this.hasPlayerCollided();
   }
 
   draw(context, camera) {

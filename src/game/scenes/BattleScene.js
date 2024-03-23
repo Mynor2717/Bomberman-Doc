@@ -8,20 +8,23 @@ import { BombSystem } from 'game/systems/BombSystem.js';
 import { PowerupSystem } from 'game/systems/PowerupSystem.js';
 
 export class BattleScene extends Scene {
+  players = [];
+
   constructor(time, camera) {
     super();
 
     this.stage = new Stage();
     this.hud = new BattleHud();
-    this.powerupSystem = new PowerupSystem(time);
+    this.powerupSystem = new PowerupSystem(time, this.players);
     this.blockSystem = new BlockSystem(this.stage.updateMapAt, this.stage.getCollisionTileAt, this.powerupSystem.add);
     this.bombSystem = new BombSystem(this.stage.collisionMap, this.blockSystem.add);
-    this.player = new Bomberman(
+
+    this.players.push(new Bomberman(
       { x: 0.3, y: 1 },
       time,
       this.stage.getCollisionTileAt,
       this.bombSystem.add,
-    );
+    ));
 
     camera.position = { x: HALF_TILE_SIZE, y: -STAGE_OFFSET_Y };
   }
@@ -30,7 +33,10 @@ export class BattleScene extends Scene {
     this.powerupSystem.update(time);
     this.blockSystem.update(time);
     this.bombSystem.update(time);
-    this.player.Update(time);
+
+    for (const player of this.players) {
+      player.Update(time);
+    }
   }
 
   draw(context, camera) {
@@ -40,6 +46,9 @@ export class BattleScene extends Scene {
     this.powerupSystem.draw(context, camera);
     this.blockSystem.draw(context, camera);
     this.bombSystem.draw(context, camera);
-    this.player.draw(context, camera);
+
+    for (const player of this.players) {
+      player.draw(context, camera);
+    }
   }
 }
