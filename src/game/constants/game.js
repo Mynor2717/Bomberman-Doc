@@ -18,7 +18,7 @@ export const HALF_TILE_SIZE = TILE_SIZE / 2;
 export const STAGE_OFFSET_Y = 24;
 
 export const NO_PLAYERS = 5;
-
+export const MAX_WINS = 3;
 
 export const DEBUG = true;
 

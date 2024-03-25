@@ -18,10 +18,10 @@ export const BombermanColor = {
 
 export const BombermanPlayerData = [
   { color: BombermanColor.WHITE, row: 1, column: 0.3 },
-  { color: BombermanColor.BLACK, row: 11, column: 14 },
-  { color: BombermanColor.RED, row: 1, column: 14 },
-  { color: BombermanColor.BLUE, row: 11, column: 2 },
-  { color: BombermanColor.GREEN, row: 5, column: 1.2 },
+  { color: BombermanColor.BLACK, row: 11, column: 1.8 },
+  { color: BombermanColor.RED, row: 1, column: 1.8 },
+  { color: BombermanColor.BLUE, row: 11, column: 0.3 },
+  { color: BombermanColor.GREEN, row: 5, column: 1.1 },
 ];
 
 const bombermanFrames = {

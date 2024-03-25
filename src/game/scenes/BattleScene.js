@@ -1,4 +1,5 @@
 import { Scene } from 'engine/Scene.js';
+import { BombermanStateType } from 'game/constants/bomberman.js';
 import { HALF_TILE_SIZE, NO_PLAYERS, STAGE_OFFSET_Y } from 'game/constants/game.js';
 import { BattleHud } from 'game/entities/BattleHud.js';
 import { Bomberman } from 'game/entities/Bomberman.js';
@@ -10,11 +11,13 @@ import { PowerupSystem } from 'game/systems/PowerupSystem.js';
 export class BattleScene extends Scene {
   players = [];
 
-  constructor(time, camera) {
+  constructor(time, camera, state, onEnd) {
     super();
 
+    this.state = state;
+    this.onEnd = onEnd;
     this.stage = new Stage();
-    this.hud = new BattleHud();
+    this.hud = new BattleHud(time, this.state);
     this.powerupSystem = new PowerupSystem(time, this.players);
     this.blockSystem = new BlockSystem(this.stage.updateMapAt, this.stage.getCollisionTileAt, this.powerupSystem.add);
     this.bombSystem = new BombSystem(this.stage.collisionMap, this.blockSystem.add);
@@ -26,13 +29,30 @@ export class BattleScene extends Scene {
     camera.position = { x: HALF_TILE_SIZE, y: -STAGE_OFFSET_Y };
   }
 
+  removePlayer = (id) => {
+    const index = this.players.findIndex((player) => player.id === id);
+    if (index < 0) return;
+
+    this.players.splice(index, 1);
+  };
+
   addPlayer(id, time) {
     this.players.push(new Bomberman(
-      id, time, this.stage.getCollisionTileAt, this.bombSystem.add,
+      id, time, this.stage.getCollisionTileAt, this.bombSystem.add, this.removePlayer,
     ));
   }
 
+  checkEndGame() {
+    if (this.players.length > 1) return;
+
+    const isLasPlayerAlive = this.players.length > 0
+      && this.players[0].currentState.type !== BombermanStateType.DEATH;
+
+    this.onEnd(isLasPlayerAlive ? this.players[0].id : -1);
+  }
+
   update(time) {
+    this.hud.update(time);
     this.powerupSystem.update(time);
     this.blockSystem.update(time);
     this.bombSystem.update(time);
@@ -40,6 +60,8 @@ export class BattleScene extends Scene {
     for (const player of this.players) {
       player.Update(time);
     }
+
+    this.checkEndGame();
   }
 
   draw(context, camera) {
