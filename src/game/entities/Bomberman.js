@@ -2,7 +2,13 @@ import { Entity } from 'engine/Entity.js';
 import { drawFrameOrigin } from 'engine/context.js';
 import * as control from 'engine/inputHandler.js';
 import { CollisionTile } from 'game/constants/LevelData.js';
-import { BombermanStateType, WALK_SPEED, animations, frames } from 'game/constants/bomberman.js';
+import {
+  BombermanPlayerData,
+  BombermanStateType,
+  WALK_SPEED,
+  getBombermanFrames,
+  animations,
+} from 'game/constants/bomberman.js';
 import { Control } from 'game/constants/controls.js';
 import { CounterDirectionsLookup, Direction, MovementLookup } from 'game/constants/entities.js';
 import { DEBUG, FRAME_TIME, HALF_TILE_SIZE, TILE_SIZE } from 'game/constants/game.js';
@@ -25,8 +31,11 @@ export class Bomberman extends Entity {
   lastBombCell = undefined;
 
 
-  constructor(position, time, getStageCollisionTileAt, onBombPlaced) {
-    super({ x: (position.x * TILE_SIZE) * HALF_TILE_SIZE, y: (position.y * TILE_SIZE) + HALF_TILE_SIZE });
+  constructor(id, time, getStageCollisionTileAt, onBombPlaced) {
+    super({
+      x: (BombermanPlayerData[id].column * TILE_SIZE) * HALF_TILE_SIZE,
+      y: (BombermanPlayerData[id].row * TILE_SIZE) + HALF_TILE_SIZE,
+    });
 
     this.states = {
       [BombermanStateType.IDLE]: {
@@ -46,7 +55,9 @@ export class Bomberman extends Entity {
       },
     };
 
-
+    this.id = id;
+    this.color = BombermanPlayerData[id].color;
+    this.frames = getBombermanFrames(this.color);
     this.starPosition = { ...this.position };
     this.getStageCollisionTileAt = getStageCollisionTileAt;
     this.onBombPlaced = onBombPlaced;
@@ -290,7 +301,7 @@ export class Bomberman extends Entity {
 
   draw(context, camera) {
     const [frameKey] = this.animation[this.animationFrame];
-    const frame = frames.get(frameKey);
+    const frame = this.frames.get(frameKey);
 
     drawFrameOrigin(
       context, this.image, frame,
