@@ -57,6 +57,8 @@ export class BattleScene extends Scene {
     this.blockSystem.update(time);
     this.bombSystem.update(time);
 
+    this.players.sort((playerA, PlayerB) => playerA.position.y - PlayerB.position.y);
+
     for (const player of this.players) {
       player.Update(time);
     }

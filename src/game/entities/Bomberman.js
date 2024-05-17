@@ -21,7 +21,7 @@ export class Bomberman extends Entity {
   id = 0;
   direction = Direction.DOWN;
   baseSpeedTime = WALK_SPEED;
-  speedMultiplier = 1.2;
+  speedMultiplier = 1.4;
   animation = animations.moveAnimations[this.direction];
 
   //Numero de bombas que puede poner al mismo tiempo
@@ -318,6 +318,11 @@ export class Bomberman extends Entity {
     drawBox(context, camera, [
       this.position.x - HALF_TILE_SIZE, this.position.y - HALF_TILE_SIZE, TILE_SIZE - 1, TILE_SIZE - 1,
     ], '#FFFF00');
+
+    const collisionBox = this.getCollisionRect();
+    drawBox(context, camera, [
+      collisionBox.x, collisionBox.y, collisionBox.width, collisionBox.height,
+    ], '#FF0000');
     drawCross(context, camera, { x: this.position.x, y: this.position.y }, '#FFF');
   }
 

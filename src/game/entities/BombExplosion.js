@@ -22,15 +22,13 @@ export class BombExplosion {
   }
 
   getBaseFrame(flamecell) {
-    if (!flamecell.isVertical && !flamecell.isLast) {
-      return BASE_HORIZONTAL_FRAME;
-    } else if (flamecell.isVertical && !flamecell.isLast) {
-      return BASE_VERTICAL_FRAME;
-    } else if (!flamecell.isVertical && flamecell.isLast) {
-      return flamecell.cell.column < this.cell.column ? BASE_LEFT_LAST_FRAME : BASE_RIGHT_LAST_FRAME;
-    } else if (flamecell.isVertical && flamecell.isLast) {
+    if (!flamecell.isLast) {
+      return flamecell.isVertical ? BASE_VERTICAL_FRAME : BASE_HORIZONTAL_FRAME;
+    } else if (flamecell.isVertical) {
       return flamecell.cell.row < this.cell.row ? BASE_TOP_LAST_FRAME : BASE_BOTTOM_LAST_FRAME;
     }
+
+    return flamecell.cell.column < this.cell.column ? BASE_LEFT_LAST_FRAME : BASE_RIGHT_LAST_FRAME;
   }
 
   updateAnimation(time) {
